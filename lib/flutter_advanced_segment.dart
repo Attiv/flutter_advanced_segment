@@ -1,8 +1,7 @@
 import 'package:flutter/widgets.dart';
 
 /// An advanced
-class AdvancedSegment<K extends Object, V extends String>
-    extends StatefulWidget {
+class AdvancedSegment<K extends Object, V extends String> extends StatefulWidget {
   const AdvancedSegment({
     Key? key,
     required this.segments,
@@ -70,8 +69,8 @@ class AdvancedSegment<K extends Object, V extends String>
   _AdvancedSegmentState<K, V> createState() => _AdvancedSegmentState();
 }
 
-class _AdvancedSegmentState<K extends Object, V extends String>
-    extends State<AdvancedSegment<K, V>> with SingleTickerProviderStateMixin {
+class _AdvancedSegmentState<K extends Object, V extends String> extends State<AdvancedSegment<K, V>>
+    with SingleTickerProviderStateMixin {
   static const _defaultTextStyle = TextStyle(
     fontWeight: FontWeight.w400,
     fontSize: 14,
@@ -111,8 +110,7 @@ class _AdvancedSegmentState<K extends Object, V extends String>
   }
 
   void _initSizes() {
-    final maxSize =
-        widget.segments.values.map(_obtainTextSize).reduce((value, element) {
+    final maxSize = widget.segments.values.map(_obtainTextSize).reduce((value, element) {
       return value.width.compareTo(element.width) >= 1 ? value : element;
     });
 
@@ -186,9 +184,8 @@ class _AdvancedSegmentState<K extends Object, V extends String>
                   decoration: widget.sliderDecoration ??
                       BoxDecoration(
                         color: widget.sliderColor,
-                        borderRadius: widget.borderRadius.subtract(
-                            BorderRadius.all(
-                                Radius.circular(widget.sliderOffset))),
+                        borderRadius:
+                            widget.borderRadius.subtract(BorderRadius.all(Radius.circular(widget.sliderOffset))),
                         boxShadow: widget.shadow,
                       ),
                 ),
@@ -202,30 +199,35 @@ class _AdvancedSegmentState<K extends Object, V extends String>
                   mainAxisAlignment: MainAxisAlignment.center,
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: widget.segments.entries.map((entry) {
-                    return GestureDetector(
-                      onHorizontalDragUpdate: (details) => _handleSegmentMove(
-                        details,
-                        entry.key,
-                        Directionality.of(context),
-                      ),
-                      onTap: () => _handleSegmentPressed(entry.key),
-                      child: Container(
-                        width: _itemSize.width,
-                        height: _itemSize.height,
-                        color: const Color(0x00000000),
-                        child: AnimatedDefaultTextStyle(
-                          duration: widget.animationDuration,
-                          style: _defaultTextStyle.merge(value == entry.key
-                              ? widget.activeStyle
-                              : widget.inactiveStyle),
-                          overflow: TextOverflow.clip,
-                          maxLines: 1,
-                          softWrap: false,
-                          child: Center(
-                            child: Text(entry.value),
+                    return Semantics(
+                      child: GestureDetector(
+                        onHorizontalDragUpdate: (details) => _handleSegmentMove(
+                          details,
+                          entry.key,
+                          Directionality.of(context),
+                        ),
+                        onTap: () => _handleSegmentPressed(entry.key),
+                        child: Container(
+                          width: _itemSize.width,
+                          height: _itemSize.height,
+                          color: const Color(0x00000000),
+                          child: AnimatedDefaultTextStyle(
+                            duration: widget.animationDuration,
+                            style:
+                                _defaultTextStyle.merge(value == entry.key ? widget.activeStyle : widget.inactiveStyle),
+                            overflow: TextOverflow.clip,
+                            maxLines: 1,
+                            softWrap: false,
+                            child: Center(
+                              child: Text(entry.value),
+                            ),
                           ),
                         ),
                       ),
+                      button: true,
+                      label: entry.value,
+                      explicitChildNodes: false,
+                      excludeSemantics: true,
                     );
                   }).toList(growable: false),
                 );
@@ -254,10 +256,7 @@ class _AdvancedSegmentState<K extends Object, V extends String>
   }
 
   double _obtainAnimationValue() {
-    return widget.segments.keys
-            .toList(growable: false)
-            .indexOf(_controller.value)
-            .toDouble() /
+    return widget.segments.keys.toList(growable: false).indexOf(_controller.value).toDouble() /
         (widget.segments.keys.length - 1);
   }
 
@@ -276,11 +275,8 @@ class _AdvancedSegmentState<K extends Object, V extends String>
       final indexKey = widget.segments.keys.toList().indexOf(value);
 
       final indexMove = textDirection == TextDirection.rtl
-          ? (_itemSize.width * indexKey - touch.localPosition.dx) /
-                  _itemSize.width +
-              1
-          : (_itemSize.width * indexKey + touch.localPosition.dx) /
-              _itemSize.width;
+          ? (_itemSize.width * indexKey - touch.localPosition.dx) / _itemSize.width + 1
+          : (_itemSize.width * indexKey + touch.localPosition.dx) / _itemSize.width;
 
       if (indexMove >= 0 && indexMove <= widget.segments.keys.length) {
         _controller.value = widget.segments.keys.elementAt(indexMove.toInt());
