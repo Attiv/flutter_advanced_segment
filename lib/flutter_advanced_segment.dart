@@ -198,38 +198,7 @@ class _AdvancedSegmentState<K extends Object, V extends String> extends State<Ad
                   mainAxisSize: MainAxisSize.min,
                   mainAxisAlignment: MainAxisAlignment.center,
                   crossAxisAlignment: CrossAxisAlignment.center,
-                  children: widget.segments.entries.map((entry) {
-                    return Semantics(
-                      child: GestureDetector(
-                        onHorizontalDragUpdate: (details) => _handleSegmentMove(
-                          details,
-                          entry.key,
-                          Directionality.of(context),
-                        ),
-                        onTap: () => _handleSegmentPressed(entry.key),
-                        child: Container(
-                          width: _itemSize.width,
-                          height: _itemSize.height,
-                          color: const Color(0x00000000),
-                          child: AnimatedDefaultTextStyle(
-                            duration: widget.animationDuration,
-                            style:
-                                _defaultTextStyle.merge(value == entry.key ? widget.activeStyle : widget.inactiveStyle),
-                            overflow: TextOverflow.clip,
-                            maxLines: 1,
-                            softWrap: false,
-                            child: Center(
-                              child: Text(entry.value),
-                            ),
-                          ),
-                        ),
-                      ),
-                      button: true,
-                      label: entry.value,
-                      explicitChildNodes: false,
-                      excludeSemantics: true,
-                    );
-                  }).toList(growable: false),
+                  children: _valueListenedWidget(value),
                 );
               },
             ),
@@ -237,6 +206,46 @@ class _AdvancedSegmentState<K extends Object, V extends String> extends State<Ad
         ),
       ),
     );
+  }
+
+  List<Widget> _valueListenedWidget(value) {
+    List<Widget> children = [];
+    for (int i = 0; i < widget.segments.entries.length; i++) {
+      MapEntry entry = (widget.segments.entries.toList())[i];
+      children.add(
+        Semantics(
+          button: true,
+          label:
+              '${(value == entry.key ? 'Selected ' : 'Not selected ') + entry.value}, ${i + 1} of ${widget.segments.entries.length}',
+          explicitChildNodes: false,
+          excludeSemantics: true,
+          child: GestureDetector(
+            onHorizontalDragUpdate: (details) => _handleSegmentMove(
+              details,
+              entry.key,
+              Directionality.of(context),
+            ),
+            onTap: () => _handleSegmentPressed(entry.key),
+            child: Container(
+              width: _itemSize.width,
+              height: _itemSize.height,
+              color: const Color(0x00000000),
+              child: AnimatedDefaultTextStyle(
+                duration: widget.animationDuration,
+                style: _defaultTextStyle.merge(value == entry.key ? widget.activeStyle : widget.inactiveStyle),
+                overflow: TextOverflow.clip,
+                maxLines: 1,
+                softWrap: false,
+                child: Center(
+                  child: Text(entry.value),
+                ),
+              ),
+            ),
+          ),
+        ),
+      );
+    }
+    return children;
   }
 
   Size _obtainTextSize(String text) {
